@@ -19,7 +19,7 @@ from src.backend.rag.prompts import (
     RAG_QUERY_TEMPLATE,
     SYSTEM_PROMPT,
 )
-from src.backend.rag.vectorstore import build_where_filter, search_documents
+from src.backend.rag.vectorstore import build_where_filter, get_collection, search_documents
 
 logger = logging.getLogger(__name__)
 
@@ -301,11 +301,19 @@ def get_rag_response(
         if not answer:
             answer = _render_clarify(profile, missing, preview_titles)
 
+        known = _profile_summary(profile)
         return {
             "answer": answer,
             "sources": [],
             "extracted_context": {**context_to_save, "_clarify_count": clarify_count + 1},
             "mode": "clarify",
+            "trace": {
+                "summary": f"🧭 추천 전에 {', '.join(missing)} 정보가 필요해요",
+                "steps": [
+                    f"질문에서 파악한 조건: {known or '없음'}",
+                    f"부족한 정보: {', '.join(missing)} → 되묻기 ({clarify_count + 1}/{MAX_CLARIFY_TURNS}회)",
+                ],
+            },
         }
 
     # Step 3: 메타데이터 필터 + 유사도 검색 (지역은 끝까지 유지하며 조건 완화)
@@ -315,6 +323,7 @@ def get_rag_response(
 
     # Step 4: LLM 답변 생성 (실패하거나 키가 없으면 템플릿 렌더링)
     answer = ""
+    used_llm = False
     if not is_mock_mode() and sources:
         answer = invoke_llm(
             prompt=RAG_QUERY_TEMPLATE.format(
@@ -328,6 +337,7 @@ def get_rag_response(
             max_tokens=2048,
             temperature=0.3,
         )
+        used_llm = bool(answer)
     if not answer:
         answer = _render_recommendation(profile, search_results.get("metadatas", []), relax_level)
 
@@ -341,4 +351,35 @@ def get_rag_response(
         "sources": sources,
         "extracted_context": {**context_to_save, "_clarify_count": clarify_count},
         "mode": "recommend",
+        "trace": _build_trace(profile, query, relax_level, len(sources), used_llm),
     }
+
+
+def _build_trace(profile: dict, query: str, relax_level: int, found: int, used_llm: bool) -> dict:
+    """답변이 어떻게 만들어졌는지 UI에 보여줄 검색 과정 요약"""
+    summary_profile = _profile_summary(profile) or "조건 미입력"
+    total = get_collection().count()
+
+    filters = []
+    if profile.get("region_sido"):
+        filters.append(f"지역(전국 + {profile['region_sido']})")
+    if profile.get("age") and relax_level <= 2:
+        filters.append(f"연령({profile['age']}세 포함)")
+    if profile.get("employment_status") and relax_level <= 1:
+        filters.append(f"대상({profile['employment_status']})")
+    if profile.get("income_level") and relax_level == 0:
+        filters.append(f"소득({profile['income_level']})")
+    categories = detect_categories(query)
+
+    steps = [
+        f"조건 파악: {summary_profile}",
+        f"메타데이터 필터: {' · '.join(filters) if filters else '없음 (전체 검색)'}",
+    ]
+    if categories:
+        steps.append(f"관심 분야 우선: {', '.join(categories)}")
+    if _RELAX_NOTES.get(relax_level):
+        steps.append(f"조건 완화: {_RELAX_NOTES[relax_level]}")
+    steps.append(f"유사도 검색: 전체 {total}건 중 {found}건 선택")
+    steps.append("답변 생성: AWS Bedrock Claude" if used_llm else "답변 생성: 검색 결과 템플릿 (데모 모드)")
+
+    return {"summary": f"🔎 {summary_profile} 조건으로 {total}건 중 {found}건을 찾았어요", "steps": steps}

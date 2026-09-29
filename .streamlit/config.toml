@@ -1,5 +1,21 @@
+# 대회 포스터(네이비 → 블루 그라데이션) 톤에 맞춘 테마
 [theme]
-primaryColor = "#1B6B47"
+base = "light"
+primaryColor = "#2563EB"
+backgroundColor = "#F5F8FF"
+secondaryBackgroundColor = "#E8EEFB"
+textColor = "#0B1736"
+linkColor = "#1D4ED8"
+borderColor = "#D5DEF2"
+baseRadius = "0.75rem"
+font = "Noto Sans KR:https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+showSidebarBorder = false
+
+[theme.sidebar]
+backgroundColor = "#0A1A3F"
+secondaryBackgroundColor = "#14295C"
+textColor = "#E6ECFF"
+borderColor = "#243B73"
 
 [client]
 # 개발자 메뉴(Deploy, 재실행 등)를 숨기고 보는 사람용 최소 툴바만 사용

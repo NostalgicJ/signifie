@@ -19,18 +19,36 @@ def _prepare_vectorstore(data_version: str) -> bool:
 
 _CUSTOM_CSS = """
 <style>
-.block-container {max-width: 920px; padding-top: 2.2rem;}
-.sg-hero {padding: 28px 30px; border-radius: 16px; margin-bottom: 18px;
-  background: linear-gradient(135deg, rgba(27,107,71,.12), rgba(27,107,71,.03));
-  border: 1px solid rgba(27,107,71,.22);}
-.sg-hero h1 {font-size: 1.9rem; line-height: 1.3; margin: 6px 0 8px; padding: 0; letter-spacing: -.02em;}
-.sg-hero p {opacity: .85; margin: 0 0 14px; font-size: 1.02rem;}
-.sg-eyebrow {font-size: .82rem; font-weight: 700; color: #1B6B47; letter-spacing: .04em;}
+.block-container {max-width: 900px; padding-top: 2rem;}
+
+/* 첫 화면 히어로 - 대회 포스터 톤 (네이비 → 블루) */
+.sg-hero {padding: 34px 34px 30px; border-radius: 20px; margin-bottom: 22px; color: #fff;
+  background: linear-gradient(125deg, #050B1F 0%, #0B2170 45%, #1D4ED8 80%, #22B8E6 100%);
+  box-shadow: 0 14px 40px rgba(11, 33, 112, .25);}
+.sg-hero h1 {color: #fff; font-size: 2.1rem; line-height: 1.25; margin: 8px 0 12px; padding: 0;
+  font-weight: 800; letter-spacing: -.02em;}
+.sg-hero p {color: rgba(255,255,255,.86); margin: 0 0 18px; font-size: 1.02rem; line-height: 1.6;}
+.sg-hero b {color: #fff;}
+.sg-eyebrow {font-size: .8rem; font-weight: 700; letter-spacing: .08em; color: #8FD3FF; text-transform: uppercase;}
 .sg-chips {display: flex; flex-wrap: wrap; gap: 8px;}
-.sg-chips span {font-size: .85rem; padding: 4px 11px; border-radius: 999px;
-  background: rgba(27,107,71,.10); border: 1px solid rgba(27,107,71,.18);}
-@media (prefers-color-scheme: dark) { .sg-eyebrow {color: #63CE97;} }
-[data-testid="stChatMessage"] table {font-size: .9rem;}
+.sg-chips span {font-size: .84rem; padding: 5px 12px; border-radius: 999px; color: #fff;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);}
+.sg-examples-title {font-weight: 700; margin: 4px 0 8px; color: #0B1736;}
+
+/* 대화: 질문과 답변을 한눈에 구분 */
+[data-testid="stChatMessage"] {border-radius: 16px; padding: 14px 18px; margin-bottom: 10px; scroll-margin-top: 72px;}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+  background: #E3ECFF; border: 1px solid #C9D8FB; margin-top: 26px;}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+  background: #FFFFFF; border: 1px solid #DCE4F5; box-shadow: 0 4px 16px rgba(11, 23, 54, .05);}
+.sg-turn {font-size: .75rem; font-weight: 800; color: #2563EB; letter-spacing: .06em; margin-bottom: 2px;}
+[data-testid="stChatMessage"] table {font-size: .88rem;}
+[data-testid="stChatMessage"] h3 {font-size: 1.15rem; margin-top: 1.2rem; padding-top: .6rem;
+  border-top: 1px dashed #D5DEF2;}
+
+/* 사이드바 입력 박스 대비 */
+[data-testid="stSidebar"] [data-testid="stAlert"] {background: #14295C; color: #E6ECFF;}
+
 /* 우측 상단 Fork·GitHub·메뉴만 숨김 - 같은 툴바 안의 사이드바 열기 버튼(stExpandSidebarButton)은 유지 */
 [data-testid="stToolbarActions"], [data-testid="stMainMenu"], [data-testid="stAppDeployButton"] {display: none !important;}
 [data-testid="stHeader"] {background: transparent;}
