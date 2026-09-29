@@ -5,6 +5,8 @@
 
 고려대학교 x AWS AI Innovators Challenge 출품작
 
+**🌐 데모: https://signifie.streamlit.app/**
+
 ---
 
 ## 해결하려는 문제

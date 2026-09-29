@@ -9,4 +9,4 @@
 ## 제출물
 - 서비스 소개서: `docs/signifie_service_intro.pdf` (10장)
 - 소스: https://github.com/NostalgicJ/signifie
-- 배포 주소: Streamlit Community Cloud 배포 후 기입
+- 배포 주소: https://signifie.streamlit.app/

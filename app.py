@@ -5,14 +5,14 @@
 
 import streamlit as st
 
-from scripts.seed_sample_data import ensure_seeded
+from scripts.seed_sample_data import ensure_seeded, seed_file_hash
 from src.frontend.chat_ui import render_chat_interface
 from src.frontend.sidebar import render_sidebar
 
 
 @st.cache_resource(show_spinner="지원사업 데이터를 불러오는 중...")
-def _prepare_vectorstore() -> bool:
-    """배포 환경 첫 실행 시 Vector DB가 비어 있으면 시드 데이터를 적재"""
+def _prepare_vectorstore(data_version: str) -> bool:
+    """Vector DB가 비어 있거나 시드 데이터가 바뀌면 적재 (data_version이 바뀌면 캐시도 무효화)"""
     ensure_seeded()
     return True
 
@@ -25,7 +25,7 @@ def main():
         initial_sidebar_state="expanded",
     )
 
-    _prepare_vectorstore()
+    _prepare_vectorstore(seed_file_hash())
 
     # 사이드바: 유저 프로필 입력 & 설정
     user_profile = render_sidebar()
