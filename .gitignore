@@ -1,0 +1,39 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ===== 가상환경 =====
+.venv/
+venv/
+env/
+
+# ===== 환경 변수 (민감 정보) =====
+.env
+.env.local
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== 데이터 (대용량) =====
+data/raw/*.pdf
+data/raw/*.hwp
+data/vectorstore/
+!data/vectorstore/.gitkeep
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Streamlit =====
+.streamlit/secrets.toml
+
+# ===== Claude Code =====
+.claude/
