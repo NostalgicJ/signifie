@@ -11,6 +11,7 @@ import math
 import re
 from functools import lru_cache
 
+import anthropic
 import boto3
 from configs.settings import get_settings
 
@@ -81,47 +82,62 @@ def _get_bedrock_runtime():
     )
 
 
+@lru_cache()
+def _get_claude_client() -> anthropic.AnthropicBedrockMantle:
+    """Anthropic SDK의 Bedrock(Mantle) 클라이언트 싱글턴"""
+    settings = get_settings()
+    return anthropic.AnthropicBedrockMantle(
+        aws_access_key=settings.aws_access_key_id or None,
+        aws_secret_key=settings.aws_secret_access_key or None,
+        aws_region=settings.aws_region,
+        timeout=60.0,
+    )
+
+
+def call_claude(prompt: str, system_prompt: str = "", max_tokens: int = 2048) -> str:
+    """
+    Bedrock Claude를 호출해 텍스트를 반환합니다. 실패하면 예외를 그대로 올립니다.
+    (연결 점검 스크립트에서 원인 확인용으로 사용)
+    """
+    settings = get_settings()
+    params = {
+        "model": settings.bedrock_model_id,
+        "max_tokens": max_tokens,
+        "messages": [{"role": "user", "content": prompt}],
+        # 대화형 응답이라 속도 우선 (최신 모델은 temperature 대신 effort로 조절)
+        "output_config": {"effort": settings.bedrock_effort},
+    }
+    if system_prompt:
+        params["system"] = system_prompt
+
+    response = _get_claude_client().messages.create(**params)
+    if response.stop_reason == "refusal":
+        logger.warning("Claude가 응답을 거절했습니다 (refusal)")
+        return ""
+    return "".join(block.text for block in response.content if block.type == "text")
+
+
 def invoke_llm(
     prompt: str,
     system_prompt: str = "",
     max_tokens: int = 2048,
-    temperature: float = 0.3,
+    temperature: float = 0.3,  # noqa: ARG001 - 최신 Claude는 sampling 파라미터 미지원, 호환용으로만 유지
 ) -> str:
     """
     Bedrock Claude 모델을 호출하여 텍스트 응답을 반환합니다.
-    AWS 키가 없으면 Mock 응답을 반환합니다.
+    AWS 키가 없거나 호출이 실패하면 빈 문자열을 반환하고, chain.py가 템플릿 응답으로 대체합니다.
     """
     if _is_mock_mode():
         return _mock_llm_response(prompt)
 
-    settings = get_settings()
-    client = _get_bedrock_runtime()
-
-    messages = [{"role": "user", "content": prompt}]
-
-    body = {
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": max_tokens,
-        "temperature": temperature,
-        "messages": messages,
-    }
-
-    if system_prompt:
-        body["system"] = system_prompt
-
     try:
-        response = client.invoke_model(
-            modelId=settings.bedrock_model_id,
-            contentType="application/json",
-            accept="application/json",
-            body=json.dumps(body),
-        )
-        response_body = json.loads(response["body"].read())
-        return response_body["content"][0]["text"]
-    except Exception as e:
-        logger.error(f"Bedrock LLM 호출 실패: {e}")
-        logger.info("Fallback - Mock 응답 반환")
-        return _mock_llm_response(prompt)
+        return call_claude(prompt, system_prompt=system_prompt, max_tokens=max_tokens)
+    except anthropic.APIStatusError as e:
+        logger.error(f"Bedrock Claude 호출 실패 ({e.status_code}): {e.message}")
+    except anthropic.APIConnectionError as e:
+        logger.error(f"Bedrock 연결 실패: {e}")
+    logger.info("Fallback - 템플릿 응답 사용")
+    return ""
 
 
 def generate_embeddings(text: str) -> list[float]:

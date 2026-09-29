@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     aws_region: str = "ap-northeast-2"
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
-    bedrock_model_id: str = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+    bedrock_model_id: str = "anthropic.claude-opus-5-5"
+    bedrock_effort: str = "low"  # low | medium | high (채팅 응답 속도 우선)
     bedrock_embedding_model_id: str = "amazon.titan-embed-text-v2:0"
 
     # --- Vector DB ---
