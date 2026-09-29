@@ -31,8 +31,8 @@ _CUSTOM_CSS = """
   background: rgba(27,107,71,.10); border: 1px solid rgba(27,107,71,.18);}
 @media (prefers-color-scheme: dark) { .sg-eyebrow {color: #63CE97;} }
 [data-testid="stChatMessage"] table {font-size: .9rem;}
-/* 우측 상단 툴바(Fork·GitHub·메뉴) 숨김 - 사이드바 여는 버튼이 있는 헤더 자체는 유지 */
-[data-testid="stToolbar"] {display: none !important;}
+/* 우측 상단 Fork·GitHub·메뉴만 숨김 - 같은 툴바 안의 사이드바 열기 버튼(stExpandSidebarButton)은 유지 */
+[data-testid="stToolbarActions"], [data-testid="stMainMenu"], [data-testid="stAppDeployButton"] {display: none !important;}
 [data-testid="stHeader"] {background: transparent;}
 </style>
 """
