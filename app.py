@@ -43,7 +43,7 @@ def main():
         page_title="시니피에 | 맞춤형 지원금 AI 비서",
         page_icon="🔍",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="auto",  # 데스크톱은 펼침, 모바일은 접힘,
     )
 
     st.markdown(_CUSTOM_CSS, unsafe_allow_html=True)
