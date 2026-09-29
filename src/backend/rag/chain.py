@@ -173,9 +173,9 @@ def _render_clarify(profile: dict, missing: list[str], preview_titles: list[str]
         "현재 상태": "(재학생 / 취업준비생 / 직장인 / 자영업자)",
     }
     known = _profile_summary(profile)
-    lines = ["딱 맞는 지원금을 찾아드릴게요! 🙌"]
+    lines = ["딱 맞는 지원금을 찾아드릴게요! 🙌  "]
     if known:
-        lines.append(f"지금까지 **{known}**(으)로 이해했어요.")
+        lines.append(f"지금까지 **{known}**(으)로 이해했어요.  ")
     lines.append("지역·연령·상태마다 받을 수 있는 사업이 달라서, 아래 정보를 알려주세요.\n")
     lines.extend(f"{i}. **{m}** {examples.get(m, '')}" for i, m in enumerate(missing, 1))
     if preview_titles:
