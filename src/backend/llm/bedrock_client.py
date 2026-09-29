@@ -79,6 +79,7 @@ def _get_bedrock_runtime():
         region_name=settings.aws_region,
         aws_access_key_id=settings.aws_access_key_id or None,
         aws_secret_access_key=settings.aws_secret_access_key or None,
+        aws_session_token=settings.aws_session_token or None,
     )
 
 
@@ -89,6 +90,7 @@ def _get_claude_client() -> anthropic.AnthropicBedrockMantle:
     return anthropic.AnthropicBedrockMantle(
         aws_access_key=settings.aws_access_key_id or None,
         aws_secret_key=settings.aws_secret_access_key or None,
+        aws_session_token=settings.aws_session_token or None,
         aws_region=settings.aws_region,
         timeout=60.0,
     )
