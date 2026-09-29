@@ -105,6 +105,7 @@ def _format_retrieved_context(search_results: dict) -> tuple[str, list[dict]]:
             "department": meta.get("department", ""),
             "url": meta.get("url", ""),
             "deadline": meta.get("deadline", ""),
+            "required_docs": _split(meta.get("required_docs", "")),
         })
 
     return "\n---\n".join(context_parts), sources

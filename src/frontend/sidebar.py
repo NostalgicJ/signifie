@@ -10,6 +10,20 @@ from src.backend.rag.profile import EMPLOYMENT_STATUSES, SIDO_ALIASES, SIGUNGU_B
 NOT_SELECTED = "선택 안함"
 
 
+def _render_detected_profile():
+    """대화에서 파악한 조건을 보여줘 사용자가 인식 결과를 확인할 수 있게 함"""
+    context = st.session_state.get("user_context") or {}
+    parts = []
+    if context.get("region_sido"):
+        parts.append(f"{context['region_sido']} {context.get('region_sigungu') or ''}".strip())
+    if context.get("age"):
+        parts.append(f"{context['age']}세")
+    if context.get("employment_status"):
+        parts.append(context["employment_status"])
+    if parts:
+        st.info("🧭 대화에서 파악한 조건\n\n" + " · ".join(parts))
+
+
 def render_sidebar() -> dict:
     """사이드바를 렌더링하고 유저 프로필 딕셔너리를 반환합니다."""
 
@@ -38,6 +52,8 @@ def render_sidebar() -> dict:
             options=[NOT_SELECTED, "50% 이하", "50~100%", "100~150%", "150% 이상", "모름"],
             index=0,
         )
+
+        _render_detected_profile()
 
         st.divider()
 
