@@ -1,0 +1,28 @@
+name: Keep Streamlit app awake
+
+on:
+  schedule:
+    - cron: "17 */4 * * *"  # 4시간마다 (UTC)
+  workflow_dispatch:
+
+jobs:
+  visit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright
+        run: |
+          pip install playwright==1.*
+          python -m playwright install --with-deps chromium
+      - name: Visit app
+        run: python scripts/keep_awake.py https://signifie.streamlit.app/
+      - name: Upload screenshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keep-awake-failure
+          path: keep_awake_failure.png
