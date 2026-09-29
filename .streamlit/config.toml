@@ -1,5 +1,9 @@
 [theme]
 primaryColor = "#1B6B47"
 
+[client]
+# 개발자 메뉴(Deploy, 재실행 등)를 숨기고 보는 사람용 최소 툴바만 사용
+toolbarMode = "minimal"
+
 [server]
 headless = true
